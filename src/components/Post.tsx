@@ -26,7 +26,7 @@ export const Post = ({ id, title, description, content, view, imageUrl, createdA
                 <span className="flex items-center text-xs text-muted-foreground">
                     <Eye className="mr-2" size={18} />
                     <span>
-                        {view} Views, Created At {formattedDate}
+                        {view} Views | Created At {formattedDate}
                     </span>
                 </span>
             </CardContent>

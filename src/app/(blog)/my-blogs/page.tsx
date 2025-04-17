@@ -3,13 +3,14 @@
 import { Post } from '@/components/Post';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { type BlogSchema } from '@/schemas/blog';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 
 const MyBlogsPage = () => {
-    const { isPending, error, data } = useQuery({
+    const { isLoading, error, data } = useQuery({
         queryKey: ['your-blogs'],
         queryFn: async () => {
             const response = await fetch('/api/blogs', {
@@ -49,6 +50,15 @@ const MyBlogsPage = () => {
             <div className="h-[4px] my-4 border-t-4" />
             <div className="flex flex-col">
                 <h1 className="text-4xl font-bold">My Blog</h1>
+
+                {isLoading && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                        {[...Array(4)].map((_, index) => (
+                            <Skeleton key={index} className="max-w-full h-[200px] rounded-2xl" />
+                        ))}
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
                     {data?.posts?.map((post: BlogSchema) => {
                         return <Post key={post.id} {...post} />;
