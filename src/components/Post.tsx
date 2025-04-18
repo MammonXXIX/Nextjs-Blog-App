@@ -21,7 +21,7 @@ export const Post = ({ id, title, description, content, view, imageUrl, createdA
                 />
             </CardHeader>
             <CardContent className="px-2 pb-2 flex flex-col gap-y-2">
-                <h1 className="text-lg font-semibold">{title}</h1>
+                <h1 className="line-clamp-1 text-lg font-semibold">{title}</h1>
                 <p className="line-clamp-2 text-muted-foreground">{description}</p>
                 <span className="flex items-center text-xs text-muted-foreground">
                     <Eye className="mr-2" size={18} />

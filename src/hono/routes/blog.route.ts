@@ -14,17 +14,31 @@ blogRoute.get('/', async (c) => {
 
         if (authError) throw authError;
 
+        const page = Number(c.req.query('page') ?? 1);
+        const limit = 8;
+        const skip = (page - 1) * limit;
+
         if (authData.user) {
-            const posts = await prisma.post.findMany({
-                where: {
-                    userId: authData.user.id,
-                },
-            });
+            const [posts, total] = await Promise.all([
+                prisma.post.findMany({
+                    where: { userId: authData.user.id },
+                    skip,
+                    take: limit,
+                    orderBy: { createdAt: 'desc' }, // opsional
+                }),
+                prisma.post.count({
+                    where: { userId: authData.user.id },
+                }),
+            ]);
 
             return c.json(
                 {
                     message: 'Get User Posts Successfully',
                     posts: posts,
+                    page: page,
+                    limit: limit,
+                    total: total,
+                    totalPages: Math.ceil(total / limit),
                 },
                 200
             );
