@@ -1,22 +1,14 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
+import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const HomePage = () => {
     return (
         <div className="flex flex-col">
-            {/* Breadcrumb */}
-            <div className="flex flex-row items-center pb-2 gap-2">
+            <div className="flex items-center gap-2 mb-2">
                 <SidebarTrigger />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Home</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                <CustomBreadcrumb />
             </div>
-            {/* Breadcrumb */}
             <Skeleton className="max-w-full h-[200px] rounded-2xl" />
         </div>
     );

@@ -1,10 +1,11 @@
 'use client';
 
 import { ButtonPagination } from '@/components/ButtonPagination';
+import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import { Post } from '@/components/Post';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
-
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { type BlogSchema } from '@/schemas/blog';
 import { useQuery } from '@tanstack/react-query';
@@ -40,20 +41,18 @@ const MyBlogsPage = () => {
         router.push(`/my-blogs?page=${page}`);
     };
 
+    if (isLoading) return <LoadingSpinner />;
+
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
+
     return (
         <div className="flex flex-col min-h-screen">
-            {/* Breadcrumb */}
-            <div className="flex flex-row items-center pb-2 gap-2">
+            <div className="flex items-center gap-2 mb-2">
                 <SidebarTrigger />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>My Blogs</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                <CustomBreadcrumb />
             </div>
-            {/* Breadcrumb */}
             <div className="flex flex-col flex-grow justify-between">
                 <div>
                     <Link href="/my-blogs/create-blog">
@@ -65,16 +64,8 @@ const MyBlogsPage = () => {
                     <div className="h-[4px] my-4 border-t-4" />
                     <h1 className="text-4xl font-bold">My Blog</h1>
 
-                    {isLoading && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
-                            {[...Array(8)].map((_, index) => (
-                                <Skeleton key={index} className="max-w-full h-[320px] rounded-2xl" />
-                            ))}
-                        </div>
-                    )}
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
-                        {data?.posts?.map((post: BlogSchema) => {
+                        {data.posts.map((post: BlogSchema) => {
                             return <Post key={post.id} {...post} />;
                         })}
                     </div>

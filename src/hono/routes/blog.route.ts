@@ -24,7 +24,7 @@ blogRoute.get('/', async (c) => {
                     where: { userId: authData.user.id },
                     skip,
                     take: limit,
-                    orderBy: { createdAt: 'desc' }, // opsional
+                    orderBy: { createdAt: 'desc' },
                 }),
                 prisma.post.count({
                     where: { userId: authData.user.id },
@@ -39,6 +39,39 @@ blogRoute.get('/', async (c) => {
                     limit: limit,
                     total: total,
                     totalPages: Math.ceil(total / limit),
+                },
+                200
+            );
+        }
+    } catch (error) {
+        return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
+blogRoute.get('/:id', async (c) => {
+    const { id } = c.req.param();
+
+    const supabase = await createClient();
+    const prisma = new PrismaClient();
+
+    try {
+        const { error: authError, data: authData } = await supabase.auth.getUser();
+
+        if (authError) throw authError;
+
+        if (authData.user) {
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+
+            return c.json(
+                {
+                    message: 'Get User Post Successfully',
+                    post: post,
                 },
                 200
             );

@@ -1,14 +1,7 @@
 'use client';
 
+import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import Tiptap from '@/components/RichTextEditor/Tiptap';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -66,22 +59,10 @@ const CreateBlogPage = () => {
 
     return (
         <div className="flex flex-col">
-            {/* Breadcrumb */}
-            <div className="flex flex-row items-center pb-2 gap-2">
+            <div className="flex items-center gap-2 mb-2">
                 <SidebarTrigger />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href="/my-blogs">My Blogs</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Create Blog</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                <CustomBreadcrumb />
             </div>
-            {/* Breadcrumb */}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))} className="flex flex-col gap-y-2">
                     <FormField

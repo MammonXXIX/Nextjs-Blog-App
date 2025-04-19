@@ -40,7 +40,7 @@ export const ButtonPagination = ({ page, totalPages, handleChangePage }: Paginat
                     <PaginationEllipsis />
                 </PaginationItem>
                 <PaginationItem>
-                    <PaginationNext onClick={page < totalPages ? () => handleChangePage(page - 1) : undefined} />
+                    <PaginationNext onClick={page < totalPages ? () => handleChangePage(page + 1) : undefined} />
                 </PaginationItem>
             </PaginationContent>
         </Pagination>

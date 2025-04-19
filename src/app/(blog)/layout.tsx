@@ -1,6 +1,7 @@
 import { AppSidebar } from '@/components/AppSidebar';
+import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import '../globals.css';
@@ -24,9 +25,7 @@ export default function BlogLayout({
                         <SidebarProvider>
                             <div className="flex w-screen">
                                 <AppSidebar />
-                                <div className="flex flex-col flex-1 p-4">
-                                    <div>{children}</div>
-                                </div>
+                                <div className="flex flex-col flex-1 p-4">{children}</div>
                             </div>
                         </SidebarProvider>
                     </ReactQueryProvider>
