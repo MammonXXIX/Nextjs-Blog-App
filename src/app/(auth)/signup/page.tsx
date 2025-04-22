@@ -33,31 +33,29 @@ const SignUpPage = () => {
 
     const { mutate, isPending } = useMutation({
         mutationFn: async (dataForm: SignUpSchema) => {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dataForm),
-            });
-
+            const response = await fetch('/api/auth/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataForm) });
             const result = await response.json();
 
             if (!response.ok) {
                 throw {
                     status: response.status,
-                    message: result.message || 'Something Went Wrong',
                     errors: result.errors,
+                    message: result.message || 'Something Went Wrong',
                 };
             }
 
             return result;
         },
         onSuccess: (data) => {
+            console.log(`Data: ${data}`);
             router.replace('/');
         },
         onError: (error: SignUpApiError) => {
             const { status, errors, message } = error;
+
+            console.log(`Status: ${status}`);
+            console.log(`Errors: ${errors}`);
+            console.log(`Message: ${message}`);
 
             if (errors?.username) {
                 form.setError('username', {
@@ -82,16 +80,13 @@ const SignUpPage = () => {
                         <CardHeader className="flex flex-col items-center justify-center">
                             <h1 className="text-4xl font-bold">Create Account 👋</h1>
                             <p className="text-sm text-center text-muted-foreground">
-                                Ensure your blog is completely flawless by refining its content, enhancing readability,
-                                and eliminating any errors to create a polished and professional final result.
+                                Ensure your blog is completely flawless by refining its content, enhancing readability, and eliminating any errors to create a polished and
+                                professional final result.
                             </p>
                         </CardHeader>
                         <CardContent>
                             <Form {...form}>
-                                <form
-                                    onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))}
-                                    className="flex flex-col gap-y-2"
-                                >
+                                <form onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))} className="flex flex-col gap-y-2">
                                     <FormField
                                         control={form.control}
                                         name="username"
@@ -127,11 +122,7 @@ const SignUpPage = () => {
                                             <FormItem>
                                                 <FormLabel>Password</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        placeholder="Password"
-                                                        type={isShowPassword ? 'text' : 'password'}
-                                                        {...field}
-                                                    />
+                                                    <Input placeholder="Password" type={isShowPassword ? 'text' : 'password'} {...field} />
                                                 </FormControl>
                                                 <FormDescription />
                                                 <FormMessage />
@@ -139,10 +130,7 @@ const SignUpPage = () => {
                                         )}
                                     />
                                     <Label className="flex items-center gap-2">
-                                        <Checkbox
-                                            checked={isShowPassword}
-                                            onCheckedChange={(checked) => setIsShowPassword(!!checked)}
-                                        />
+                                        <Checkbox checked={isShowPassword} onCheckedChange={(checked) => setIsShowPassword(!!checked)} />
                                         Show Password
                                     </Label>
                                     <Button className="size-lg mt-4" disabled={isPending}>

@@ -19,10 +19,7 @@ authRoute.post('/signup', async (c) => {
         const body = await c.req.json();
         const { username, email, password } = body;
 
-        const [existingUsername, existingEmail] = await Promise.all([
-            prisma.user.findUnique({ where: { username } }),
-            prisma.user.findUnique({ where: { email } }),
-        ]);
+        const [existingUsername, existingEmail] = await Promise.all([prisma.user.findUnique({ where: { username } }), prisma.user.findUnique({ where: { email } })]);
 
         if (existingUsername || existingEmail) {
             const errors: ExistingCredentialsError = {};
@@ -33,17 +30,13 @@ authRoute.post('/signup', async (c) => {
             return c.json({ errors, message: 'Credentials Conflict' }, 409);
         }
 
-        const { error, data: signUpData } = await supabase.auth.signUp({
-            email,
-            password,
-        });
-
+        const { error, data: auth } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
-        if (signUpData.user) {
+        if (auth.user) {
             await prisma.user.create({
                 data: {
-                    id: signUpData.user.id,
+                    id: auth.user.id,
                     username: username,
                     email: email,
                 },
@@ -51,8 +44,8 @@ authRoute.post('/signup', async (c) => {
         }
 
         return c.json({ message: 'Sign Up Successfully' }, 200);
-    } catch (error) {
-        return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
+    } catch (err) {
+        return c.json({ errors: err instanceof Error ? err.message : 'Unknown Error', message: 'Server Internal Error' }, 500);
     } finally {
         await prisma.$disconnect();
     }
@@ -65,36 +58,33 @@ authRoute.post('/signin', async (c) => {
         const body = await c.req.json();
         const { email, password } = body;
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
         return c.json({ message: 'Sign In Successfully' }, 200);
-    } catch (error) {
-        if (error instanceof AuthError) {
-            switch (error.code) {
+    } catch (err) {
+        if (err instanceof AuthError) {
+            switch (err.code) {
                 case SUPABASE_AUTH_ERROR_CODE.INVALID_CREDENTIALS:
-                    return c.json({ errors: error, message: 'Credentials Invalid' }, 401);
+                    return c.json({ errors: err, message: 'Credentials Invalid' }, 401);
             }
         }
 
-        return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
+        return c.json({ errors: err instanceof Error ? err.message : 'Unknown Error', message: 'Server Internal Error' }, 500);
     }
 });
 
 authRoute.post('/signout', async (c) => {
     const supabase = await createClient();
 
-    const { error } = await supabase.auth.signOut();
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
 
-    if (error) {
-        return c.json({ message: 'Sign Out Failed' }, 500);
+        return c.json({ message: 'Sign Out Successfully' }, 200);
+    } catch (err) {
+        return c.json({ errors: err instanceof Error ? err.message : 'Unknown Error', message: 'Server Internal Error' }, 500);
     }
-
-    return c.json({ message: 'Sign Out Successfully' }, 200);
 });
 
 export default authRoute;

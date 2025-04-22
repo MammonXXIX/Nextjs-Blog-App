@@ -1,66 +1,29 @@
-'use client';
-
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Post } from '@/components/Post';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useQuery } from '@tanstack/react-query';
-import Image from 'next/image';
-import { use } from 'react';
+import { Pencil } from 'lucide-react';
+import Link from 'next/link';
 
-type BlogPageProps = {
-    params: Promise<{ id: string }>;
-};
-
-const BlogPage = ({ params }: BlogPageProps) => {
-    const { id } = use(params);
-
-    const { isLoading, error, data } = useQuery({
-        queryKey: [id],
-        queryFn: async () => {
-            const response = await fetch(`/api/blogs/${id}`, {
-                method: 'GET',
-            });
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error);
-            }
-
-            return result;
-        },
-        staleTime: 1000 * 60 * 5,
-    });
-
-    if (isLoading) return <LoadingSpinner />;
-
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    }
+const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="relative flex flex-col min-h-screen overflow-hidden">
             <div className="flex items-center gap-2 mb-2">
                 <SidebarTrigger />
                 <CustomBreadcrumb
                     overrides={{
-                        [id]: data.post.title,
+                        [id]: 'Blog',
                     }}
                 />
             </div>
-            <div className="flex flex-col gap-2">
-                <div className="relative w-full h-[300px] rounded-xl overflow-hidden">
-                    <Image
-                        src={data.post.imageUrl}
-                        alt={data.post.title}
-                        fill
-                        priority
-                        quality={20}
-                        className="object-cover"
-                    />
-                </div>
-                <div className="prose prose-slate">
-                    <div dangerouslySetInnerHTML={{ __html: data.post.content }} />
-                </div>
+
+            <Post id={id} />
+
+            <div className="fixed bottom-10 right-10 p-5 rounded-full bg-accent-foreground">
+                <Link href={`${id}/edit`}>
+                    <Pencil className="text-secondary" />
+                </Link>
             </div>
         </div>
     );

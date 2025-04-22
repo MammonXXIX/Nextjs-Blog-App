@@ -33,14 +33,7 @@ const SignInPage = () => {
 
     const { mutate, isPending } = useMutation({
         mutationFn: async (dataForm: SignInSchema) => {
-            const response = await fetch('/api/auth/signin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dataForm),
-            });
-
+            const response = await fetch('/api/auth/signin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataForm) });
             const result = await response.json();
 
             if (!response.ok) {
@@ -54,10 +47,15 @@ const SignInPage = () => {
             return result;
         },
         onSuccess: (data) => {
+            console.log(`Data: ${data}`);
             router.replace('/');
         },
         onError: (error: SignInApiError) => {
             const { status, errors, message } = error;
+
+            console.log(`Status: ${status}`);
+            console.log(`Errors: ${errors}`);
+            console.log(`Message: ${message}`);
 
             if (errors?.code === SUPABASE_AUTH_ERROR_CODE.INVALID_CREDENTIALS) {
                 form.setError('email', {
@@ -79,16 +77,13 @@ const SignInPage = () => {
                         <CardHeader className="flex flex-col items-center justify-center">
                             <h1 className="text-4xl font-bold">Welcome Back 👋</h1>
                             <p className="text-sm text-center text-muted-foreground">
-                                Ensure your blog is completely flawless by refining its content, enhancing readability,
-                                and eliminating any errors to create a polished and professional final result.
+                                Ensure your blog is completely flawless by refining its content, enhancing readability, and eliminating any errors to create a polished and
+                                professional final result.
                             </p>
                         </CardHeader>
                         <CardContent>
                             <Form {...form}>
-                                <form
-                                    onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))}
-                                    className="flex flex-col gap-y-2"
-                                >
+                                <form onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))} className="flex flex-col gap-y-2">
                                     <FormField
                                         control={form.control}
                                         name="email"
@@ -110,11 +105,7 @@ const SignInPage = () => {
                                             <FormItem>
                                                 <FormLabel>Password</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        placeholder="Password"
-                                                        type={isShowPassword ? 'text' : 'password'}
-                                                        {...field}
-                                                    />
+                                                    <Input placeholder="Password" type={isShowPassword ? 'text' : 'password'} {...field} />
                                                 </FormControl>
                                                 <FormDescription />
                                                 <FormMessage />
@@ -122,10 +113,7 @@ const SignInPage = () => {
                                         )}
                                     />
                                     <Label className="flex items-center gap-2">
-                                        <Checkbox
-                                            checked={isShowPassword}
-                                            onCheckedChange={(checked) => setIsShowPassword(!!checked)}
-                                        />
+                                        <Checkbox checked={isShowPassword} onCheckedChange={(checked) => setIsShowPassword(!!checked)} />
                                         Show Password
                                     </Label>
                                     <Button className="size-lg mt-4" disabled={isPending}>

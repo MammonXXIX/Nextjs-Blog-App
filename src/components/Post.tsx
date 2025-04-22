@@ -1,38 +1,49 @@
-import { type BlogSchema } from '@/schemas/blog';
-import { Card, CardContent, CardHeader } from './ui/card';
-import Image from 'next/image';
-import { format } from 'date-fns';
-import { Eye } from 'lucide-react';
-import Link from 'next/link';
+'use client';
 
-export const Post = ({ id, title, description, content, view, imageUrl, createdAt, userId }: BlogSchema) => {
-    const formattedDate = format(new Date(createdAt), 'dd MMMM yyyy');
+import { useQuery } from '@tanstack/react-query';
+import { LoadingSpinner } from './ui/loading-spinner';
+import Image from 'next/image';
+
+export const Post = ({ id }: { id: string }) => {
+    const { isLoading, error, data } = useQuery({
+        queryKey: [id],
+        queryFn: async () => {
+            const response = await fetch(`/api/blogs/${id}`, {
+                method: 'GET',
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error);
+            }
+
+            return result;
+        },
+    });
+
+    if (isLoading) return <LoadingSpinner />;
+
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
 
     return (
-        <Link href={`my-blogs/${id}`}>
-            <Card className="w-full border p-0 gap-1 overflow-hidden bg-primary-foreground">
-                <CardHeader className="relative w-full h-[200px]">
-                    <Image
-                        src={imageUrl}
-                        alt={title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 200px"
-                        priority
-                        quality={20}
-                        className="object-cover"
-                    />
-                </CardHeader>
-                <CardContent className="px-2 pb-2 flex flex-col gap-y-2">
-                    <h1 className="line-clamp-1 text-lg font-semibold">{title}</h1>
-                    <p className="line-clamp-2 text-muted-foreground">{description}</p>
-                    <span className="flex items-center text-xs text-muted-foreground">
-                        <Eye className="mr-2" size={18} />
-                        <span>
-                            {view} Views | Created At {formattedDate}
-                        </span>
-                    </span>
-                </CardContent>
-            </Card>
-        </Link>
+        <div className="flex flex-col gap-4 mt-20 mx-0 sm:mx-0 md:mx-10 lg:mx-20 xl:mx-40">
+            <h1 className="text-3xl">{data.post.title}</h1>
+            <h3 className="text-xl text-muted-foreground">{data.post.description}</h3>
+            <div className="relative w-full h-[300px] rounded-xl overflow-hidden">
+                <Image
+                    src={data.post.imageUrl}
+                    alt={data.post.title}
+                    fill
+                    loading="lazy"
+                    quality={20}
+                    className="object-cover"
+                />
+            </div>
+            <div className="prose prose-slate">
+                <div dangerouslySetInnerHTML={{ __html: data.post.content }} />
+            </div>
+        </div>
     );
 };

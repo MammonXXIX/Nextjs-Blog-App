@@ -63,70 +63,64 @@ const CreateBlogPage = () => {
                 <SidebarTrigger />
                 <CustomBreadcrumb />
             </div>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))} className="flex flex-col gap-y-2">
-                    <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field: { value, onChange, ...fieldProps } }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input
-                                        type="file"
-                                        className="h-[40px]"
-                                        {...fieldProps}
-                                        onChange={(e) => onChange(e.target.files?.[0])}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Your Blog Title" {...field} className="h-[40px]" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Textarea
-                                        placeholder="Type Your Description Blog Here"
-                                        {...field}
-                                        className="h-[100px]"
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="content"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Tiptap onChange={field.onChange} content={field.value} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <Button className="size-lg" disabled={isPending}>
-                        Create Blog
-                    </Button>
-                </form>
-            </Form>
+            <form onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))} className="flex flex-col gap-y-2">
+                <Form {...form}>
+                    <>
+                        <FormField
+                            control={form.control}
+                            name="image"
+                            render={({ field: { value, onChange, ...fieldProps } }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input type="file" className="h-[40px]" {...fieldProps} onChange={(e) => onChange(e.target.files?.[0])} />
+                                        {value && <span className="text-xs text-muted-foreground">{value.name}</span>}
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Your Blog Title" {...field} className="h-[40px]" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Textarea placeholder="Type Your Description Blog Here" {...field} className="h-[100px]" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="content"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Tiptap onChange={field.onChange} content={field.value} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button className="size-lg" disabled={isPending}>
+                            Create Blog
+                        </Button>
+                    </>
+                </Form>
+            </form>
         </div>
     );
 };

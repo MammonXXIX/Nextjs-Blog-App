@@ -1,27 +1,18 @@
 'use client';
 
+import { AvatarImage } from '@radix-ui/react-avatar';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { LogOut, Settings, User } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button } from './ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Skeleton } from './ui/skeleton';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import { AvatarImage } from '@radix-ui/react-avatar';
+import { Button } from './ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { Skeleton } from './ui/skeleton';
 
 export const ButtonProfile = () => {
     const router = useRouter();
 
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ['currentUser'],
         queryFn: async () => {
             const response = await fetch('/api/users/currentUser', {
@@ -35,7 +26,7 @@ export const ButtonProfile = () => {
         staleTime: 1000 * 60 * 10,
     });
 
-    const { mutate, isPending } = useMutation({
+    const { mutate } = useMutation({
         mutationFn: async () => {
             const response = await fetch('/api/auth/signout', {
                 method: 'POST',
