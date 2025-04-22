@@ -1,5 +1,6 @@
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import PostContainer from '@/components/PostContainer';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 import { Plus } from 'lucide-react';
@@ -21,7 +22,7 @@ const MyBlogsPage = () => {
                 <div className="h-[4px] my-4 border-t-4" />
                 <h1 className="text-3xl font-bold">Last Created Blog</h1>
 
-                <Suspense fallback={<div>Loading posts...</div>}>
+                <Suspense fallback={<LoadingSpinner />}>
                     <PostContainer />
                 </Suspense>
             </div>

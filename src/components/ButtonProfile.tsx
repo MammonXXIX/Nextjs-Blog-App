@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Skeleton } from './ui/skeleton';
+import { Tilecase } from '@/utils/Tilecase';
 
 export const ButtonProfile = () => {
     const router = useRouter();
@@ -28,15 +29,10 @@ export const ButtonProfile = () => {
 
     const { mutate } = useMutation({
         mutationFn: async () => {
-            const response = await fetch('/api/auth/signout', {
-                method: 'POST',
-            });
-
+            const response = await fetch('/api/auth/signout', { method: 'POST' });
             const result = await response.json();
 
-            if (!response.ok) {
-                throw new Error();
-            }
+            if (!response.ok) throw new Error();
 
             return result;
         },
@@ -44,8 +40,8 @@ export const ButtonProfile = () => {
             console.log(data);
             router.replace('/signin');
         },
-        onError: (error) => {
-            console.log(error);
+        onError: (err) => {
+            console.log(err);
         },
     });
 
@@ -57,9 +53,9 @@ export const ButtonProfile = () => {
                         <Button variant={'ghost'}>
                             <Avatar className="mr-2">
                                 <AvatarImage src="https://github.com/shadcn.png" alt="Avatar" />
-                                <AvatarFallback>Avatar</AvatarFallback>
+                                <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
-                            {data.user.username}
+                            {Tilecase(data.user.username)}
                         </Button>
                     ) : (
                         <Skeleton className="w-full h-[50px]" />
