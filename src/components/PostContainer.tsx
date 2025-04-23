@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ButtonPagination } from './ButtonPagination';
 import { PostCard } from './PostCard';
 import { LoadingSpinner } from './ui/loading-spinner';
+import { Skeleton } from './ui/skeleton';
 
 type ResponsePostContainer = {
     message: string;
@@ -41,21 +42,28 @@ const PostContainer = () => {
 
     return (
         <div className="flex flex-col mt-4">
-            {isLoading && <LoadingSpinner />}
+            {isLoading && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {Array.from({ length: 8 }).map((_, index) => (
+                        <Skeleton key={index} className="w-full  h-[18rem] rounded-2xl" />
+                    ))}
+                </div>
+            )}
             {isError && <>Error: {error}</>}
             {data?.posts.length === 0 && !isLoading && !isError && <>No Posts Found.</>}
 
             {data?.posts && data.posts.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {data.posts.map((post: BlogSchema, index) => {
-                        return <PostCard key={post.id} {...post} isPriority={index < 4} />;
-                    })}
+                <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {data.posts.map((post: BlogSchema, index) => {
+                            return <PostCard key={post.id} {...post} isPriority={index < 4} />;
+                        })}
+                    </div>
+                    <div className="mt-4">
+                        <ButtonPagination page={page} totalPages={totalPages} handleChangePage={handleChangePage} />
+                    </div>
                 </div>
             )}
-
-            <div className="mt-4">
-                <ButtonPagination page={page} totalPages={totalPages} handleChangePage={handleChangePage} />
-            </div>
         </div>
     );
 };

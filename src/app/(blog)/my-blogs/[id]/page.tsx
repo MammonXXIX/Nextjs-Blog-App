@@ -8,23 +8,23 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
 
     return (
-        <div className="relative flex flex-col min-h-screen overflow-hidden">
+        <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-2">
                 <SidebarTrigger />
                 <CustomBreadcrumb
                     overrides={{
-                        [id]: 'Blog',
+                        [id]: id,
                     }}
                 />
             </div>
 
-            <Post id={id} />
+            <Post />
 
-            <div className="fixed bottom-10 right-10 p-5 rounded-full bg-accent-foreground">
-                <Link href={`${id}/edit`}>
+            <Link href={`${id}/edit`}>
+                <div className="fixed bottom-10 right-10 p-5 rounded-full bg-accent-foreground">
                     <Pencil className="text-secondary" />
-                </Link>
-            </div>
+                </div>
+            </Link>
         </div>
     );
 };

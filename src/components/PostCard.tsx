@@ -11,7 +11,7 @@ export const PostCard = ({ id, title, description, view, imageUrl, createdAt, is
     return (
         <Link href={`my-blogs/${id}`}>
             <Card className="w-full p-0 rounded-none">
-                <CardHeader className="relative w-full h-[13rem]">
+                <CardHeader className="relative w-full h-[9rem]">
                     <Image
                         src={imageUrl}
                         alt={title}
