@@ -1,21 +1,17 @@
 'use client';
 
+import BlogFormCreate from '@/components/BlogFormCreate';
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
-import Tiptap from '@/components/RichTextEditor/Tiptap';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Textarea } from '@/components/ui/textarea';
 import { createBlogSchema, type CreateBlogSchema } from '@/schemas/blog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 const CreateBlogPage = () => {
+    const router = useRouter();
+
     const form = useForm<CreateBlogSchema>({
         resolver: zodResolver(createBlogSchema),
         defaultValues: {
@@ -25,8 +21,6 @@ const CreateBlogPage = () => {
             image: undefined,
         },
     });
-
-    const router = useRouter();
 
     const { mutate, isPending } = useMutation({
         mutationFn: async (dataForm: CreateBlogSchema) => {
@@ -40,16 +34,15 @@ const CreateBlogPage = () => {
             const response = await fetch('/api/blogs', { method: 'POST', body: formData });
             const result = await response.json();
 
-            if (!response.ok) throw new Error(result);
+            if (!response.ok) console.log(`Result: ${response}`);
 
             return result;
         },
-        onSuccess: (data) => {
-            toast(data.message);
-            router.replace('/my-blogs');
+        onSuccess: (res) => {
+            console.log(res);
         },
         onError: (err: Error) => {
-            console.log(`Error: ${err}`);
+            console.log(err);
         },
     });
 
@@ -59,76 +52,8 @@ const CreateBlogPage = () => {
                 <SidebarTrigger />
                 <CustomBreadcrumb />
             </div>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit((dataForm) => mutate(dataForm))} className="flex flex-col gap-y-2">
-                    <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field: { value, onChange, ...fieldProps } }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <div className="flex flex-col gap-2">
-                                        {value && (
-                                            <div className="relative w-full h-[13rem]">
-                                                <Image
-                                                    src={URL.createObjectURL(value)}
-                                                    alt={value.name}
-                                                    fill
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                    priority
-                                                    quality={50}
-                                                    className="object-cover rounded-xl"
-                                                />
-                                            </div>
-                                        )}
-                                        <Input type="file" className="h-[40px]" {...fieldProps} onChange={(e) => onChange(e.target.files?.[0])} />
-                                    </div>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Your Blog Title" {...field} className="h-[40px]" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Textarea placeholder="Type Your Description Blog Here" {...field} className="h-[100px]" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="content"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Tiptap onChange={field.onChange} content={field.value} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <Button className="size-lg" disabled={isPending}>
-                        Create Blog
-                    </Button>
-                </form>
-            </Form>
+
+            <BlogFormCreate form={form} onSubmit={mutate} isPending={isPending} />
         </div>
     );
 };

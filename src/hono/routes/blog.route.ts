@@ -144,9 +144,7 @@ blogRoute.patch('/:id', async (c) => {
         const content = body.get('content') as string;
         const image = body.get('image') as File;
 
-        image ? console.log('image dikirim') : console.log('image tidak dikirim');
-
-        console.log(body);
+        image ? console.log('New Image') : console.log('No New Image');
 
         return c.json({ message: 'Blog Update Successfully' }, 200);
     } catch (err) {
