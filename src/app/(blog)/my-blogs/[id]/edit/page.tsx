@@ -1,6 +1,6 @@
 'use client';
 
-import BlogFormUpdate from '@/components/BlogFormUpdate';
+import BlogForm from '@/components/BlogForm';
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -49,7 +49,10 @@ const EditPage = () => {
             newForm.append('description', form.description);
             newForm.append('content', form.content);
 
-            if (form.image instanceof File) newForm.append('image', form.image);
+            if (form.image instanceof File) {
+                if (data?.post.imageUrl) newForm.append('oldImage', data.post.imageUrl);
+                newForm.append('newImage', form.image);
+            }
 
             const response = await fetch(`/api/blogs/${id}`, { method: 'PATCH', body: newForm });
             const result = await response.json();
@@ -88,7 +91,7 @@ const EditPage = () => {
                 {isLoading && <LoadingSpinner />}
                 {isError && <>Error: {error}</>}
 
-                {data?.post && <BlogFormUpdate isEdit {...data} form={form} onSubmit={mutate} isPending={isPending} />}
+                {data?.post && <BlogForm<UpdateBlogSchema> isEdit {...data} form={form} onSubmit={mutate} isPending={isPending} />}
             </div>
         </div>
     );

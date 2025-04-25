@@ -1,32 +1,34 @@
 'use client';
 
-import { type BlogSchema, type CreateBlogSchema, type UpdateBlogSchema } from '@/schemas/blog';
+import { type BlogSchema } from '@/schemas/blog';
 import Image from 'next/image';
-import { UseFormReturn } from 'react-hook-form';
+import { type FieldValues, Path, UseFormReturn } from 'react-hook-form';
 import Tiptap from './RichTextEditor/Tiptap';
 import { Button } from './ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 
-type BlogFormCreateProps = {
-    form: UseFormReturn<CreateBlogSchema>;
-    onSubmit: (form: CreateBlogSchema) => void;
+type BlogFormUpdateProps<T extends FieldValues> = {
+    isEdit?: boolean;
+    post?: BlogSchema;
+    form: UseFormReturn<T>;
+    onSubmit: (form: T) => void;
     isPending: boolean;
 };
 
-const BlogFormCreate = ({ form, onSubmit, isPending }: BlogFormCreateProps) => {
+const BlogForm = <T extends FieldValues>({ isEdit = false, post, form, onSubmit, isPending }: BlogFormUpdateProps<T>) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit((form) => onSubmit(form))} className="flex flex-col gap-y-2">
                 <FormField
                     control={form.control}
-                    name="image"
+                    name={'image' as Path<T>}
                     render={({ field: { value, onChange, ...fieldProps } }) => (
                         <FormItem>
                             <FormControl>
                                 <div className="flex flex-col gap-2">
-                                    {value && value instanceof File && (
+                                    {value ? (
                                         <div className="relative w-full h-[13rem]">
                                             <Image
                                                 src={URL.createObjectURL(value)}
@@ -38,6 +40,21 @@ const BlogFormCreate = ({ form, onSubmit, isPending }: BlogFormCreateProps) => {
                                                 className="object-cover rounded-xl"
                                             />
                                         </div>
+                                    ) : (
+                                        isEdit &&
+                                        post && (
+                                            <div className="relative w-full h-[13rem]">
+                                                <Image
+                                                    src={post.imageUrl}
+                                                    alt={post.title}
+                                                    fill
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                    priority
+                                                    quality={50}
+                                                    className="object-cover rounded-xl"
+                                                />
+                                            </div>
+                                        )
                                     )}
                                     <Input type="file" className="h-[40px]" {...fieldProps} onChange={(e) => onChange(e.target.files?.[0])} />
                                 </div>
@@ -48,7 +65,7 @@ const BlogFormCreate = ({ form, onSubmit, isPending }: BlogFormCreateProps) => {
                 />
                 <FormField
                     control={form.control}
-                    name="title"
+                    name={'title' as Path<T>}
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
@@ -60,7 +77,7 @@ const BlogFormCreate = ({ form, onSubmit, isPending }: BlogFormCreateProps) => {
                 />
                 <FormField
                     control={form.control}
-                    name="description"
+                    name={'description' as Path<T>}
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
@@ -72,7 +89,7 @@ const BlogFormCreate = ({ form, onSubmit, isPending }: BlogFormCreateProps) => {
                 />
                 <FormField
                     control={form.control}
-                    name="content"
+                    name={'content' as Path<T>}
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
@@ -83,11 +100,11 @@ const BlogFormCreate = ({ form, onSubmit, isPending }: BlogFormCreateProps) => {
                     )}
                 />
                 <Button className="size-lg" disabled={isPending}>
-                    Create Blog
+                    {isEdit ? 'Update Blog' : 'Create Blog'}
                 </Button>
             </form>
         </Form>
     );
 };
 
-export default BlogFormCreate;
+export default BlogForm;

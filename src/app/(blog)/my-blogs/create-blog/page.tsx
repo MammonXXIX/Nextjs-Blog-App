@@ -1,6 +1,6 @@
 'use client';
 
-import BlogFormCreate from '@/components/BlogFormCreate';
+import BlogForm from '@/components/BlogForm';
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { createBlogSchema, type CreateBlogSchema } from '@/schemas/blog';
@@ -53,7 +53,7 @@ const CreateBlogPage = () => {
                 <CustomBreadcrumb />
             </div>
 
-            <BlogFormCreate form={form} onSubmit={mutate} isPending={isPending} />
+            <BlogForm<CreateBlogSchema> form={form} onSubmit={mutate} isPending={isPending} />
         </div>
     );
 };

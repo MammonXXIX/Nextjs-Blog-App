@@ -104,7 +104,6 @@ blogRoute.get('/:id', async (c) => {
 
     try {
         const { error: authError, data: authData } = await supabase.auth.getUser();
-
         if (authError) throw authError;
 
         if (authData.user) {
@@ -142,12 +141,95 @@ blogRoute.patch('/:id', async (c) => {
         const title = body.get('title') as string;
         const description = body.get('description') as string;
         const content = body.get('content') as string;
-        const image = body.get('image') as File;
+        const oldImage = body.get('oldImage') as string;
+        const newImage = body.get('newImage') as File;
 
-        image ? console.log('New Image') : console.log('No New Image');
+        let fullPath;
+
+        if (newImage) {
+            const fileExtension = newImage.name.split('.').pop();
+            const fileName = `${id}.${fileExtension}`;
+            const timeStamp = new Date().toISOString();
+            const filePath = `${id}/${fileName}-${timeStamp}`;
+
+            const fileBuffer = await newImage.arrayBuffer();
+
+            const { error: storageRemoveError, data: storageRemoveData } = await supabase.storage
+                .from('post')
+                .remove([oldImage.split('supabase.co/storage/v1/object/public/post/')[1]]);
+            if (storageRemoveError) throw storageRemoveError;
+
+            console.log(storageRemoveData);
+
+            const { error: storageError, data: storageData } = await supabase.storage.from('post').upload(filePath, fileBuffer);
+            if (storageError) throw storageError;
+
+            fullPath = storageData.fullPath;
+        }
+
+        const { error: authError, data: authData } = await supabase.auth.getUser();
+        if (authError) throw authError;
+
+        if (authData.user) {
+            await prisma.post.update({
+                where: {
+                    id: id,
+                },
+                data: {
+                    title: title,
+                    description: description,
+                    content: content,
+                    ...(fullPath && { imageUrl: `${process.env.SUPABASE_STORAGE_URL}${fullPath}` }),
+                },
+            });
+        }
 
         return c.json({ message: 'Blog Update Successfully' }, 200);
     } catch (err) {
+        return c.json({ errors: err instanceof Error ? err.message : 'Unknown Error', message: 'Server Internal Error' }, 500);
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
+blogRoute.delete('/:id', async (c) => {
+    const { id } = c.req.param();
+
+    const supabase = await createClient();
+    const prisma = new PrismaClient();
+
+    try {
+        const { error: authError, data: authData } = await supabase.auth.getUser();
+        if (authError) throw authError;
+
+        if (authData.user) {
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: id,
+                    userId: authData.user.id,
+                },
+            });
+
+            if (post) {
+                const { error: storageRemoveError, data: storageRemoveData } = await supabase.storage
+                    .from('post')
+                    .remove([post.imageUrl.split('supabase.co/storage/v1/object/public/post/')[1]]);
+                if (storageRemoveError) throw storageRemoveError;
+
+                console.log(storageRemoveData);
+
+                await prisma.post.delete({
+                    where: {
+                        id: id,
+                        userId: authData.user.id,
+                    },
+                });
+            }
+
+            return c.json({ message: 'Blog Delete Successfully' }, 200);
+        }
+    } catch (err) {
+        console.log(err);
         return c.json({ errors: err instanceof Error ? err.message : 'Unknown Error', message: 'Server Internal Error' }, 500);
     } finally {
         await prisma.$disconnect();
