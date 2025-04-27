@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { LoadingSpinner } from './ui/loading-spinner';
+import { LoadingSpinner } from '../ui/loading-spinner';
 import Image from 'next/image';
 import { type BlogSchema } from '@/schemas/blog';
 import { useParams } from 'next/navigation';
@@ -11,7 +11,7 @@ type ResponsesPost = {
     post: BlogSchema;
 };
 
-export const Post = () => {
+export const BlogPublic = () => {
     const { id } = useParams();
 
     const { data, isLoading, isError, error } = useQuery<ResponsesPost>({

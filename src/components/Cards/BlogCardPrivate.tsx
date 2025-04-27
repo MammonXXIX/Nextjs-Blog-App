@@ -1,11 +1,11 @@
 import { type BlogSchema } from '@/schemas/blog';
-import { Card, CardContent, CardHeader } from './ui/card';
+import { Card, CardContent, CardHeader } from '../ui/card';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
 
-export const PostCard = ({ id, title, description, view, imageUrl, createdAt, isPriority = false }: BlogSchema & { isPriority?: boolean }) => {
+export const BlogCardPrivate = ({ id, title, description, view, imageUrl, createdAt, isPriority = false }: BlogSchema & { isPriority?: boolean }) => {
     const formattedDate = format(new Date(createdAt), 'dd MMMM yyyy');
 
     return (

@@ -40,6 +40,7 @@ const CreateBlogPage = () => {
         },
         onSuccess: (res) => {
             console.log(res);
+            router.replace('/my-blogs');
         },
         onError: (err: Error) => {
             console.log(err);

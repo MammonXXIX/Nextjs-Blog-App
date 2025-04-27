@@ -1,5 +1,5 @@
+import BlogContainerPrivate from '@/components/Containers/BlogContainerPrivate';
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
-import PostContainer from '@/components/PostContainer';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Plus } from 'lucide-react';
@@ -22,7 +22,7 @@ const MyBlogsPage = () => {
                 <h1 className="text-2xl font-bold">Last Created Blog</h1>
 
                 <Suspense fallback={<LoadingSpinner />}>
-                    <PostContainer />
+                    <BlogContainerPrivate />
                 </Suspense>
             </div>
         </div>

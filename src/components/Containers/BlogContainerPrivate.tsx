@@ -3,10 +3,9 @@
 import { type BlogSchema } from '@/schemas/blog';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ButtonPagination } from './ButtonPagination';
-import { PostCard } from './PostCard';
-import { LoadingSpinner } from './ui/loading-spinner';
-import { Skeleton } from './ui/skeleton';
+import { ButtonPagination } from '../ButtonPagination';
+import { BlogCardPrivate } from '../Cards/BlogCardPrivate';
+import { Skeleton } from '../ui/skeleton';
 
 type ResponsePostContainer = {
     message: string;
@@ -17,15 +16,15 @@ type ResponsePostContainer = {
     totalPages: number;
 };
 
-const PostContainer = () => {
+const BlogContainerPrivate = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const page = Number(searchParams.get('page')) || 1;
 
     const { data, isLoading, isError, error } = useQuery<ResponsePostContainer>({
-        queryKey: ['your-blogs', page],
+        queryKey: ['blogs/me', page],
         queryFn: async () => {
-            const response = await fetch(`/api/blogs?page=${page}`, { method: 'GET' });
+            const response = await fetch(`/api/blogs/me?page=${page}`, { method: 'GET' });
             const result = await response.json();
 
             if (!response.ok) throw new Error(result.error);
@@ -56,7 +55,7 @@ const PostContainer = () => {
                 <div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {data.posts.map((post: BlogSchema, index) => {
-                            return <PostCard key={post.id} {...post} isPriority={index < 4} />;
+                            return <BlogCardPrivate key={post.id} {...post} isPriority={index < 4} />;
                         })}
                     </div>
                     <div className="mt-4">
@@ -68,4 +67,4 @@ const PostContainer = () => {
     );
 };
 
-export default PostContainer;
+export default BlogContainerPrivate;

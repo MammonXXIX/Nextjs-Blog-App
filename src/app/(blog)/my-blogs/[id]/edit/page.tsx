@@ -6,8 +6,8 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BlogSchema, type UpdateBlogSchema, updateBlogSchema } from '@/schemas/blog';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -18,6 +18,8 @@ type ResponsesPost = {
 
 const EditPage = () => {
     const { id } = useParams();
+    const router = useRouter();
+    const queryClient = useQueryClient();
 
     const { data, isLoading, isError, error } = useQuery<ResponsesPost>({
         queryKey: [id],
@@ -63,6 +65,10 @@ const EditPage = () => {
         },
         onSuccess: (res) => {
             console.log(res);
+
+            queryClient.invalidateQueries({ queryKey: [id] });
+
+            router.replace(`/my-blogs/${id}`);
         },
         onError: (err: Error) => {
             console.log(err);

@@ -35,7 +35,7 @@ export const blogSchema = z.object({
     title: z.string(),
     description: z.string(),
     content: z.string(),
-    view: z.string(),
+    view: z.number(),
     imageUrl: z.string(),
     createdAt: z.coerce.date(),
     userId: z.string(),

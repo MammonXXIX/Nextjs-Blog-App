@@ -1,16 +1,16 @@
-import BlogContainerPublic from '@/components/Containers/BlogContainerPublic';
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
+import { BlogPublic } from '@/components/Pages/BlogPublic';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Skeleton } from '@/components/ui/skeleton';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 
-const HomePage = async () => {
+const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
     const queryClient = new QueryClient();
 
     await queryClient.prefetchQuery({
-        queryKey: ['blogs'],
+        queryKey: [id],
         queryFn: async () => {
-            const response = await fetch('/api/blogs', { method: 'GET' });
+            const response = await fetch(`/api/blogs/me/${id}`, { method: 'GET' });
             const result = await response.json();
 
             if (!response.ok) throw new Error(result.error);
@@ -23,16 +23,18 @@ const HomePage = async () => {
         <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-2">
                 <SidebarTrigger />
-                <CustomBreadcrumb />
+                <CustomBreadcrumb
+                    overrides={{
+                        [id]: id,
+                    }}
+                />
             </div>
 
-            <Skeleton className="max-w-full h-[200px] rounded-2xl" />
-
             <HydrationBoundary state={dehydrate(queryClient)}>
-                <BlogContainerPublic />
+                <BlogPublic />
             </HydrationBoundary>
         </div>
     );
 };
 
-export default HomePage;
+export default BlogPage;

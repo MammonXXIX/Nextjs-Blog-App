@@ -2,6 +2,8 @@ import { createClient } from '@/utils/supabase/server';
 import { PrismaClient } from '@prisma/client';
 import { Hono } from 'hono';
 import { v4 as uuidv4 } from 'uuid';
+import { getUser } from '../server';
+import { BlogSchema } from '@/schemas/blog';
 
 const blogRoute = new Hono();
 
@@ -52,9 +54,52 @@ blogRoute.post('/', async (c) => {
     }
 });
 
+export type GetBlogsPublicResponse = {
+    message: string;
+    blogs: BlogSchema[];
+    nextCursor?: string;
+};
+
 blogRoute.get('/', async (c) => {
     const supabase = await createClient();
     const prisma = new PrismaClient();
+
+    try {
+        const { error: authError, data: authData } = await supabase.auth.getUser();
+        if (authError) throw authError;
+
+        const cursor = c.req.query('cursor');
+        const limit = 6;
+
+        if (authData.user) {
+            const posts = await prisma.post.findMany({
+                take: limit + 1,
+                cursor: cursor ? { id: cursor } : undefined,
+                orderBy: { createdAt: 'desc' },
+            });
+
+            const nextCursor = posts.length > limit ? posts[limit].id : undefined;
+
+            const response: GetBlogsPublicResponse = {
+                message: 'Get All Posts Successfully',
+                blogs: posts.slice(0, limit),
+                nextCursor: nextCursor,
+            };
+
+            return c.json(response, 200);
+        }
+    } catch (error) {
+        return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
+blogRoute.get('/me', async (c) => {
+    const supabase = await createClient();
+    const prisma = new PrismaClient();
+
+    console.log(getUser());
 
     try {
         const { error: authError, data: authData } = await supabase.auth.getUser();
@@ -97,7 +142,39 @@ blogRoute.get('/', async (c) => {
 });
 
 blogRoute.get('/:id', async (c) => {
-    const { id } = c.req.param();
+    const id = c.req.param('id');
+
+    const supabase = await createClient();
+    const prisma = new PrismaClient();
+
+    try {
+        const { error: authError, data: authData } = await supabase.auth.getUser();
+        if (authError) throw authError;
+
+        if (authData.user) {
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+
+            return c.json(
+                {
+                    message: 'Get User Post Successfully',
+                    post: post,
+                },
+                200
+            );
+        }
+    } catch (error) {
+        return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
+blogRoute.get('/me/:id', async (c) => {
+    const id = c.req.param('id');
 
     const supabase = await createClient();
     const prisma = new PrismaClient();

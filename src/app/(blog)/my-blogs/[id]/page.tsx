@@ -1,7 +1,7 @@
 'use client';
 
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
-import { Post } from '@/components/Post';
+import { BlogPrivate } from '@/components/Pages/BlogPrivate';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,7 +14,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Pencil, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -32,8 +32,8 @@ const BlogPage = () => {
 
             return result;
         },
-        onSuccess: (data) => {
-            console.log(data);
+        onSuccess: (res) => {
+            console.log(res);
             router.replace('/my-blogs');
         },
         onError: (err) => {
@@ -52,7 +52,7 @@ const BlogPage = () => {
                 />
             </div>
 
-            <Post />
+            <BlogPrivate />
 
             <AlertDialog>
                 <AlertDialogTrigger className="fixed bottom-30 right-10 p-5 rounded-full bg-destructive">
