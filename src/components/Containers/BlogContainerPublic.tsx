@@ -1,17 +1,17 @@
 'use client';
 
-import { BlogSchema } from '@/schemas/blog';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { BlogCardPublic } from '../Cards/BlogCardPublic';
-import { Skeleton } from '../ui/skeleton';
 import { GetBlogsPublicResponse } from '@/hono/routes/blog.route';
-import { Button } from '../ui/button';
-import { LoadingSpinner } from '../ui/loading-spinner';
+import { BlogSchema } from '@/schemas/blog';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { BlogCardPublic } from '../Cards/BlogCardPublic';
+import BlogCardLoading from '../Loading/BlogCardLoading';
+import InfiniteScrollContainer from './InfiniteScrollContainer';
 
 const BlogContainerPublic = () => {
     const {
         data: res,
         isPending,
+        isFetching,
         isError,
         error,
         fetchNextPage,
@@ -34,27 +34,22 @@ const BlogContainerPublic = () => {
     const blogs = res?.pages.flatMap((page) => page.blogs);
 
     return (
-        <div className="flex flex-col mt-4">
-            {isPending && <LoadingSpinner />}
+        <div>
+            {isPending && <BlogCardLoading length={6} />}
             {blogs?.length === 0 && !isPending && !isError && <>No Blogs Found.</>}
 
             {blogs && blogs.length > 0 && (
-                <div className="flex flex-col justify-center items-center gap-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {blogs.map((post: BlogSchema, index: number) => {
-                            return <BlogCardPublic key={post.id} {...post} isPriority={index < 4} />;
-                        })}
-                    </div>
-                    <div>
-                        {hasNextPage && (
-                            <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-                                {isFetchingNextPage ? 'Loading...' : 'Load More'}
-                            </Button>
-                        )}
-                    </div>
-                </div>
+                <InfiniteScrollContainer
+                    onBottomReached={() => hasNextPage && !isFetching && fetchNextPage()}
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                >
+                    {blogs.map((post: BlogSchema, index: number) => {
+                        return <BlogCardPublic key={post.id} {...post} isPriority={index < 4} />;
+                    })}
+                </InfiniteScrollContainer>
             )}
 
+            {isFetchingNextPage && <BlogCardLoading length={6} />}
             {isError && <>Something Went Wrong: ${error.message}</>}
         </div>
     );

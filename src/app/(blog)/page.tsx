@@ -1,7 +1,7 @@
+import { BlogSearch } from '@/components/BlogSearch';
 import BlogContainerPublic from '@/components/Containers/BlogContainerPublic';
 import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Skeleton } from '@/components/ui/skeleton';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 
 const HomePage = async () => {
@@ -26,7 +26,7 @@ const HomePage = async () => {
                 <CustomBreadcrumb />
             </div>
 
-            <Skeleton className="max-w-full h-[200px] rounded-2xl" />
+            <BlogSearch />
 
             <HydrationBoundary state={dehydrate(queryClient)}>
                 <BlogContainerPublic />

@@ -5,13 +5,13 @@ import { format } from 'date-fns';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
 
-export const BlogCardPrivate = ({ id, title, description, view, imageUrl, createdAt, isPriority = false }: BlogSchema & { isPriority?: boolean }) => {
+export const BlogSearchCardPublic = ({ id, title, description, view, imageUrl, createdAt, isPriority = false }: BlogSchema & { isPriority?: boolean }) => {
     const formattedDate = format(new Date(createdAt), 'dd MMMM yyyy');
 
     return (
-        <Link href={`my-blogs/${id}`}>
-            <Card className="w-full p-0 rounded-none">
-                <CardHeader className="relative w-full h-[9rem]">
+        <Link href={`/${id}`}>
+            <Card className="flex flex-row items-center w-full p-2 rounded-none bg-primary-foreground hover:bg-muted">
+                <CardHeader className="relative w-[5rem] h-[5rem]">
                     <Image
                         src={imageUrl}
                         alt={title}
@@ -23,14 +23,14 @@ export const BlogCardPrivate = ({ id, title, description, view, imageUrl, create
                     />
                 </CardHeader>
                 <CardContent className="px-2 pb-2 flex flex-col gap-y-2">
-                    <h1 className="line-clamp-1 font-semibold">{title}</h1>
-                    <h2 className="line-clamp-2 text-lg text-muted-foreground">{description}</h2>
-                    <span className="flex items-center text-xs text-muted-foreground">
+                    <h1 className="line-clamp-1 text-lg font-semibold">{title}</h1>
+                    <h2 className="line-clamp-2 text-sm text-muted-foreground">{description}</h2>
+                    {/* <span className="flex items-center text-xs text-muted-foreground">
                         <Eye className="mr-2" size={18} />
                         <span>
                             {view} Views | Created At {formattedDate}
                         </span>
-                    </span>
+                    </span> */}
                 </CardContent>
             </Card>
         </Link>

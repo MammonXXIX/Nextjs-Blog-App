@@ -69,7 +69,7 @@ blogRoute.get('/', async (c) => {
         if (authError) throw authError;
 
         const cursor = c.req.query('cursor');
-        const limit = 6;
+        const limit = 8;
 
         if (authData.user) {
             const posts = await prisma.post.findMany({
@@ -84,6 +84,48 @@ blogRoute.get('/', async (c) => {
                 message: 'Get All Posts Successfully',
                 blogs: posts.slice(0, limit),
                 nextCursor: nextCursor,
+            };
+
+            return c.json(response, 200);
+        }
+    } catch (error) {
+        return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
+export type GetBlogsSearchResponse = {
+    message: string;
+    blogs: BlogSchema[];
+};
+
+blogRoute.get('/search', async (c) => {
+    const supabase = await createClient();
+    const prisma = new PrismaClient();
+
+    try {
+        const { error: authError, data: authData } = await supabase.auth.getUser();
+        if (authError) throw authError;
+
+        const searchQuery = c.req.query('search');
+        const limit = 4;
+
+        if (authData.user) {
+            const posts = await prisma.post.findMany({
+                where: {
+                    title: {
+                        contains: searchQuery,
+                        mode: 'insensitive',
+                    },
+                },
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+            });
+
+            const response: GetBlogsSearchResponse = {
+                message: 'Get All Posts Successfully',
+                blogs: posts,
             };
 
             return c.json(response, 200);
