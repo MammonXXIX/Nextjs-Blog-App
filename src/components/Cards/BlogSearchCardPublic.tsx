@@ -25,12 +25,6 @@ export const BlogSearchCardPublic = ({ id, title, description, view, imageUrl, c
                 <CardContent className="px-2 pb-2 flex flex-col gap-y-2">
                     <h1 className="line-clamp-1 text-lg font-semibold">{title}</h1>
                     <h2 className="line-clamp-2 text-sm text-muted-foreground">{description}</h2>
-                    {/* <span className="flex items-center text-xs text-muted-foreground">
-                        <Eye className="mr-2" size={18} />
-                        <span>
-                            {view} Views | Created At {formattedDate}
-                        </span>
-                    </span> */}
                 </CardContent>
             </Card>
         </Link>

@@ -1,17 +1,37 @@
-# NextJS Blog App
+# 📝 Next.js Blog App
 
-A web application to post your blogs, built with NextJS and Hono.
+A web application to post and manage your blogs, built with **Next.js** and **Hono**.
 
-## Features
+## 🛠 Tech Stack
 
--   Supabase Authentication & Storage
--   Restful API Architecture
--   Pagination
+-   [Next.js](https://nextjs.org/)
+-   [Hono](https://hono.dev/)
+-   [Shadcn UI](https://ui.shadcn.com/)
+-   [Prisma ORM](https://www.prisma.io/)
+-   [Supabase](https://supabase.com/)
 
-## How To Install
+## 🚀 Features
 
-1. Clone this repo
-2. git clone https://github.com/MammonXXIX/Nextjs-Blog-App.git
-3. cd nextjs-blog-app
-4. npm install
-5. npm run dev
+-   🔐 Supabase Authentication & Storage
+-   🧱 RESTful API Architecture
+-   📄 Pagination
+-   ♾️ Infinite Scrolling
+-   🔎 Search Functionality
+
+## 📦 Installation
+
+Follow these steps to get started:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/MammonXXIX/Nextjs-Blog-App.git
+
+# 2. Navigate to the project directory
+cd nextjs-blog-app
+
+# 3. Install dependencies
+npm install
+
+# 4. Start the development server
+npm run dev
+```
