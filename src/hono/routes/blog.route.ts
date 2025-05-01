@@ -1,9 +1,8 @@
+import { GetBlogResponse, GetBlogsInfiniteResponse, GetBlogsPaginationResponse, GetBlogsSearchResponse } from '@/types/blog';
 import { createClient } from '@/utils/supabase/server';
 import { PrismaClient } from '@prisma/client';
 import { Hono } from 'hono';
 import { v4 as uuidv4 } from 'uuid';
-import { getUser } from '../server';
-import { BlogSchema } from '@/schemas/blog';
 
 const blogRoute = new Hono();
 
@@ -54,12 +53,6 @@ blogRoute.post('/', async (c) => {
     }
 });
 
-export type GetBlogsPublicResponse = {
-    message: string;
-    blogs: BlogSchema[];
-    nextCursor?: string;
-};
-
 blogRoute.get('/', async (c) => {
     const supabase = await createClient();
     const prisma = new PrismaClient();
@@ -80,7 +73,7 @@ blogRoute.get('/', async (c) => {
 
             const nextCursor = posts.length > limit ? posts[limit].id : undefined;
 
-            const response: GetBlogsPublicResponse = {
+            const response: GetBlogsInfiniteResponse = {
                 message: 'Get All Posts Successfully',
                 blogs: posts.slice(0, limit),
                 nextCursor: nextCursor,
@@ -94,11 +87,6 @@ blogRoute.get('/', async (c) => {
         await prisma.$disconnect();
     }
 });
-
-export type GetBlogsSearchResponse = {
-    message: string;
-    blogs: BlogSchema[];
-};
 
 blogRoute.get('/search', async (c) => {
     const supabase = await createClient();
@@ -141,8 +129,6 @@ blogRoute.get('/me', async (c) => {
     const supabase = await createClient();
     const prisma = new PrismaClient();
 
-    console.log(getUser());
-
     try {
         const { error: authError, data: authData } = await supabase.auth.getUser();
         if (authError) throw authError;
@@ -164,17 +150,16 @@ blogRoute.get('/me', async (c) => {
                 }),
             ]);
 
-            return c.json(
-                {
-                    message: 'Get User Posts Successfully',
-                    posts: posts,
-                    page: page,
-                    limit: limit,
-                    total: total,
-                    totalPages: Math.ceil(total / limit),
-                },
-                200
-            );
+            const response: GetBlogsPaginationResponse = {
+                message: 'Get User Posts Successfully',
+                blogs: posts,
+                page: page,
+                limit: limit,
+                total: total,
+                totalPages: Math.ceil(total / limit),
+            };
+
+            return c.json(response, 200);
         }
     } catch (error) {
         return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
@@ -200,13 +185,12 @@ blogRoute.get('/:id', async (c) => {
                 },
             });
 
-            return c.json(
-                {
-                    message: 'Get User Post Successfully',
-                    post: post,
-                },
-                200
-            );
+            const response: GetBlogResponse = {
+                message: 'Get User Post Successfully',
+                blog: post!,
+            };
+
+            return c.json(response, 200);
         }
     } catch (error) {
         return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);
@@ -233,13 +217,12 @@ blogRoute.get('/me/:id', async (c) => {
                 },
             });
 
-            return c.json(
-                {
-                    message: 'Get User Post Successfully',
-                    post: post,
-                },
-                200
-            );
+            const response: GetBlogResponse = {
+                message: 'Get User Post Successfully',
+                blog: post!,
+            };
+
+            return c.json(response, 200);
         }
     } catch (error) {
         return c.json({ error: error instanceof Error ? error.message : 'Server Internal Error' }, 500);

@@ -5,9 +5,10 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useDebounce } from '@/utils/UseDebounce';
 import { useQuery } from '@tanstack/react-query';
-import { GetBlogsSearchResponse } from '@/hono/routes/blog.route';
 import { BlogSchema } from '@/schemas/blog';
 import { BlogSearchCardPublic } from './Cards/BlogSearchCardPublic';
+import { GetBlogsSearchResponse } from '@/types/blog';
+import { LoadingSpinner } from './ui/loading-spinner';
 
 export const BlogSearch = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -48,13 +49,15 @@ export const BlogSearch = () => {
                 </Button>
             </div>
 
-            {isLoading && <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded bg-primary-foreground">Loading Blogs ...</div>}
-            {isError && <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded bg-primary-foreground">Error: {error.message}</div>}
-            {!isLoading && !isError && res?.blogs.length === 0 && (
-                <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded bg-primary-foreground">No Blogs Found</div>
+            {isLoading && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded bg-primary-foreground">
+                    <LoadingSpinner />
+                </div>
             )}
+            {isError && <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded bg-primary-foreground">Something Went Wrong: {error.message}</div>}
+            {res && res.blogs.length === 0 && !isLoading && !isError && <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded bg-primary-foreground">No Blogs Found</div>}
 
-            {res?.blogs && res.blogs.length > 0 && (
+            {res && res.blogs && res.blogs.length > 0 && (
                 <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded bg-primary-foreground">
                     {res.blogs.map((blog: BlogSchema, index) => (
                         <BlogSearchCardPublic key={index} {...blog} isPriority={true} />

@@ -11,13 +11,13 @@ import { Textarea } from './ui/textarea';
 
 type BlogFormUpdateProps<T extends FieldValues> = {
     isEdit?: boolean;
-    post?: BlogSchema;
+    blog?: BlogSchema;
     form: UseFormReturn<T>;
     onSubmit: (form: T) => void;
     isPending: boolean;
 };
 
-const BlogForm = <T extends FieldValues>({ isEdit = false, post, form, onSubmit, isPending }: BlogFormUpdateProps<T>) => {
+const BlogForm = <T extends FieldValues>({ isEdit = false, blog, form, onSubmit, isPending }: BlogFormUpdateProps<T>) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit((form) => onSubmit(form))} className="flex flex-col gap-y-2">
@@ -42,11 +42,11 @@ const BlogForm = <T extends FieldValues>({ isEdit = false, post, form, onSubmit,
                                         </div>
                                     ) : (
                                         isEdit &&
-                                        post && (
+                                        blog && (
                                             <div className="relative w-full h-[13rem]">
                                                 <Image
-                                                    src={post.imageUrl}
-                                                    alt={post.title}
+                                                    src={blog.imageUrl}
+                                                    alt={blog.title}
                                                     fill
                                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                     priority

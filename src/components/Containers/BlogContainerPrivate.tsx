@@ -1,27 +1,23 @@
 'use client';
 
-import { type BlogSchema } from '@/schemas/blog';
+import { GetBlogsPaginationResponse } from '@/types/blog';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ButtonPagination } from '../ButtonPagination';
 import { BlogCardPrivate } from '../Cards/BlogCardPrivate';
-import { Skeleton } from '../ui/skeleton';
-
-type ResponsePostContainer = {
-    message: string;
-    posts: BlogSchema[];
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-};
+import BlogCardLoading from '../Loading/BlogCardLoading';
 
 const BlogContainerPrivate = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const page = Number(searchParams.get('page')) || 1;
 
-    const { data, isLoading, isError, error } = useQuery<ResponsePostContainer>({
+    const {
+        data: res,
+        isLoading,
+        isError,
+        error,
+    } = useQuery<GetBlogsPaginationResponse>({
         queryKey: ['blogs/me', page],
         queryFn: async () => {
             const response = await fetch(`/api/blogs/me?page=${page}`, { method: 'GET' });
@@ -33,33 +29,27 @@ const BlogContainerPrivate = () => {
         },
     });
 
-    const totalPages = data?.totalPages || 1;
+    const totalPages = (res && res.totalPages) || 1;
 
-    const handleChangePage = (page: number) => {
+    const handlePagination = (page: number) => {
         router.push(`/my-blogs?page=${page}`);
     };
 
     return (
         <div className="flex flex-col mt-4">
-            {isLoading && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {Array.from({ length: 8 }).map((_, index) => (
-                        <Skeleton key={index} className="w-full  h-[18rem] rounded-2xl" />
-                    ))}
-                </div>
-            )}
-            {isError && <>Error: {error}</>}
-            {data?.posts.length === 0 && !isLoading && !isError && <>No Posts Found.</>}
+            {isLoading && <BlogCardLoading length={8} />}
+            {isError && <p>Something Went Wrong: {error.message}</p>}
+            {res && res.blogs.length === 0 && !isLoading && !isError && <p>No Posts Found.</p>}
 
-            {data?.posts && data.posts.length > 0 && (
+            {res && res.blogs && res.blogs.length > 0 && (
                 <div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {data.posts.map((post: BlogSchema, index) => {
+                        {res.blogs.map((post, index) => {
                             return <BlogCardPrivate key={post.id} {...post} isPriority={index < 4} />;
                         })}
                     </div>
                     <div className="mt-4">
-                        <ButtonPagination page={page} totalPages={totalPages} handleChangePage={handleChangePage} />
+                        <ButtonPagination page={page} totalPages={totalPages} handleChangePage={handlePagination} />
                     </div>
                 </div>
             )}

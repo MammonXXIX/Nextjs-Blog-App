@@ -5,26 +5,27 @@ import { CustomBreadcrumb } from '@/components/CustomBreadcrumb';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BlogSchema, type UpdateBlogSchema, updateBlogSchema } from '@/schemas/blog';
+import { GetBlogResponse } from '@/types/blog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-type ResponsesPost = {
-    message: string;
-    post: BlogSchema;
-};
-
 const EditPage = () => {
     const { id } = useParams();
     const router = useRouter();
     const queryClient = useQueryClient();
 
-    const { data, isLoading, isError, error } = useQuery<ResponsesPost>({
+    const {
+        data: res,
+        isLoading,
+        isError,
+        error,
+    } = useQuery<GetBlogResponse>({
         queryKey: [id],
         queryFn: async () => {
-            const response = await fetch(`/api/blogs/${id}`, { method: 'GET' });
+            const response = await fetch(`/api/blogs/me/${id}`, { method: 'GET' });
             const result = await response.json();
 
             if (!response.ok) throw new Error(result.error);
@@ -52,7 +53,7 @@ const EditPage = () => {
             newForm.append('content', form.content);
 
             if (form.image instanceof File) {
-                if (data?.post.imageUrl) newForm.append('oldImage', data.post.imageUrl);
+                if (res && res.blog.imageUrl) newForm.append('oldImage', res.blog.imageUrl);
                 newForm.append('newImage', form.image);
             }
 
@@ -76,15 +77,15 @@ const EditPage = () => {
     });
 
     useEffect(() => {
-        if (data?.post) {
+        if (res && res.blog) {
             form.reset({
-                title: data.post.title,
-                description: data.post.description,
-                content: data.post.content,
+                title: res.blog.title,
+                description: res.blog.description,
+                content: res.blog.content,
                 image: undefined,
             });
         }
-    }, [data?.post, form]);
+    }, [res && res.blog, form]);
 
     return (
         <div className="flex flex-col">
@@ -97,7 +98,7 @@ const EditPage = () => {
                 {isLoading && <LoadingSpinner />}
                 {isError && <>Error: {error}</>}
 
-                {data?.post && <BlogForm<UpdateBlogSchema> isEdit {...data} form={form} onSubmit={mutate} isPending={isPending} />}
+                {res && res.blog && <BlogForm<UpdateBlogSchema> isEdit blog={res.blog} form={form} onSubmit={mutate} isPending={isPending} />}
             </div>
         </div>
     );

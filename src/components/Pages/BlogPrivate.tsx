@@ -1,20 +1,20 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { LoadingSpinner } from '../ui/loading-spinner';
 import Image from 'next/image';
-import { type BlogSchema } from '@/schemas/blog';
 import { useParams } from 'next/navigation';
-
-type ResponsesPost = {
-    message: string;
-    post: BlogSchema;
-};
+import { LoadingSpinner } from '../ui/loading-spinner';
+import { GetBlogResponse } from '@/types/blog';
 
 export const BlogPrivate = () => {
     const { id } = useParams();
 
-    const { data, isLoading, isError, error } = useQuery<ResponsesPost>({
+    const {
+        data: res,
+        isLoading,
+        isError,
+        error,
+    } = useQuery<GetBlogResponse>({
         queryKey: [id],
         queryFn: async () => {
             const response = await fetch(`/api/blogs/me/${id}`, { method: 'GET' });
@@ -29,16 +29,16 @@ export const BlogPrivate = () => {
     return (
         <div>
             {isLoading && <LoadingSpinner />}
-            {isError && <>Error: {error}</>}
+            {isError && <p>Something Went Wrong: {error.message}</p>}
 
-            {data?.post && (
+            {res && res.blog && (
                 <div className="flex flex-col gap-4 mt-10 mx-0 sm:mx-0 md:mx-10 lg:mx-20 xl:mx-30">
-                    <h1 className="text-3xl">{data.post.title}</h1>
-                    <h3 className="text-xl text-muted-foreground">{data.post.description}</h3>
+                    <h1 className="text-3xl">{res.blog.title}</h1>
+                    <h3 className="text-xl text-muted-foreground">{res.blog.description}</h3>
                     <div className="relative w-full h-[20rem]">
                         <Image
-                            src={data.post.imageUrl}
-                            alt={data.post.title}
+                            src={res.blog.imageUrl}
+                            alt={res.blog.title}
                             fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             priority
@@ -47,7 +47,7 @@ export const BlogPrivate = () => {
                         />
                     </div>
                     <div className="prose prose-slate">
-                        <div dangerouslySetInnerHTML={{ __html: data.post.content }} />
+                        <div dangerouslySetInnerHTML={{ __html: res.blog.content }} />
                     </div>
                 </div>
             )}
