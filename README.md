@@ -5,11 +5,11 @@ a web application to post and manage your blogs, built with **Next.js** and **Ho
 ## Preview
 
 <p align="center">
-  <img src="public/preview/001.png" width="200"/>
-  <img src="public/preview/002.png" width="200"/>
+  <img src="public/preview/001.png" width="400"/>
+  <img src="public/preview/002.png" width="400"/>
   <br/>
-  <img src="public/preview/003.png" width="200"/>
-  <img src="public/preview/004.png" width="200"/>
+  <img src="public/preview/003.png" width="400"/>
+  <img src="public/preview/004.png" width="400"/>
 </p>
 
 ## 🛠 Tech Stack
